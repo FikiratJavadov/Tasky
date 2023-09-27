@@ -12,11 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.createBoard = exports.getBoards = void 0;
 const db_1 = require("../db");
 const getBoards = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allBoard = yield db_1.prisma.board.findMany({
-        include: {
-            columns: true,
-        },
-    });
+    const allBoard = yield db_1.prisma.board.findMany();
     res.status(200).json({ data: allBoard });
 });
 exports.getBoards = getBoards;

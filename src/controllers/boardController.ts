@@ -2,11 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../db';
 
 export const getBoards = async (req: Request, res: Response) => {
-  const allBoard = await prisma.board.findMany({
-    include: {
-      columns: true,
-    },
-  });
+  const allBoard = await prisma.board.findMany();
   res.status(200).json({ data: allBoard });
 };
 

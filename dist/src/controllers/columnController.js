@@ -12,11 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getColumns = void 0;
 const db_1 = require("../db");
 const getColumns = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const allColumns = yield db_1.prisma.column.findMany({
-        include: {
-            task: true,
-        },
-    });
+    const allColumns = yield db_1.prisma.column.findMany();
     res.status(200).json({ data: allColumns });
 });
 exports.getColumns = getColumns;
