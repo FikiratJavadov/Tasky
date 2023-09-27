@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Board {
+  id        Int      @id @default(autoincrement())
+  name      String
+  columns   Column[]
+  createdAt DateTime @default(now())
+}
+
+model Column {
+  id        Int      @id @default(autoincrement())
+  name      String
+  boardId   Int
+  board     Board    @relation(fields: [boardId], references: [id])
+  createdAt DateTime @default(now())
+  Task      Task[]
+}
+
+enum Priority {
+  LOW
+  HIGH
+}
+
+//Temp
+model File {
+  id        Int      @id @default(autoincrement())
+  name      String
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  content   String
+  taskId    Int
+  task      Task     @relation(fields: [taskId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  priority    Priority  @default(LOW)
+  columnId    Int
+  files       File[]
+  comments    Comment[]
+  column      Column    @relation(fields: [columnId], references: [id])
+  createdAt   DateTime  @default(now())
+}
