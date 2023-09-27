@@ -23,7 +23,19 @@ model Column {
   boardId   Int
   board     Board    @relation(fields: [boardId], references: [id])
   createdAt DateTime @default(now())
-  Task      Task[]
+  task      Task[]
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  priority    Priority  @default(LOW)
+  columnId    Int
+  column      Column    @relation(fields: [columnId], references: [id])
+  files       File[]
+  comments    Comment[]
+  createdAt   DateTime  @default(now())
 }
 
 enum Priority {
@@ -46,16 +58,4 @@ model Comment {
   taskId    Int
   task      Task     @relation(fields: [taskId], references: [id])
   createdAt DateTime @default(now())
-}
-
-model Task {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  priority    Priority  @default(LOW)
-  columnId    Int
-  files       File[]
-  comments    Comment[]
-  column      Column    @relation(fields: [columnId], references: [id])
-  createdAt   DateTime  @default(now())
 }
