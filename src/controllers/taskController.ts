@@ -15,16 +15,20 @@ export const createTask = async (req: Request, res: Response) => {
   if (!name || !columnId)
     return res.status(404).json({ message: 'Missing some fields' });
 
-  const newTask = await prisma.task.create({
-    data: {
-      name,
-      column: {
-        connect: {
-          id: columnId,
+  try {
+    const newTask = await prisma.task.create({
+      data: {
+        name,
+        column: {
+          connect: {
+            id: columnId,
+          },
         },
       },
-    },
-  });
+    });
 
-  res.status(201).json({ data: newTask });
+    res.status(201).json({ data: newTask });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
 };

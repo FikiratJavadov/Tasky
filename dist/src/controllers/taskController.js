@@ -21,16 +21,21 @@ const createTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     const { name, columnId } = (_a = req.body) !== null && _a !== void 0 ? _a : {};
     if (!name || !columnId)
         return res.status(404).json({ message: 'Missing some fields' });
-    const newTask = yield db_1.prisma.task.create({
-        data: {
-            name,
-            column: {
-                connect: {
-                    id: columnId,
+    try {
+        const newTask = yield db_1.prisma.task.create({
+            data: {
+                name,
+                column: {
+                    connect: {
+                        id: columnId,
+                    },
                 },
             },
-        },
-    });
-    res.status(201).json({ data: newTask });
+        });
+        res.status(201).json({ data: newTask });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
 });
 exports.createTask = createTask;

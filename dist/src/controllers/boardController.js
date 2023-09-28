@@ -9,13 +9,42 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createBoard = exports.getBoards = void 0;
+exports.createBoard = exports.getDetailedBoard = exports.getBoards = void 0;
 const db_1 = require("../db");
 const getBoards = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allBoard = yield db_1.prisma.board.findMany();
     res.status(200).json({ data: allBoard });
 });
 exports.getBoards = getBoards;
+const getDetailedBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const id = req.params.id;
+    try {
+        if (!id)
+            return res.status(404).json({ message: 'Id is missing' });
+        if (Number.isNaN(+id))
+            return res.status(404).json({ message: 'Incorrect ID' });
+        const board = yield db_1.prisma.board.findUnique({
+            where: {
+                id: +id,
+            },
+            include: {
+                columns: {
+                    include: {
+                        task: true,
+                    },
+                },
+            },
+        });
+        if (!board)
+            return res.status(404).json({ message: 'Board not found' });
+        res.status(200).json({ data: board });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.getDetailedBoard = getDetailedBoard;
+exports.getDetailedBoard;
 const createBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { name } = (_a = req.body) !== null && _a !== void 0 ? _a : {};

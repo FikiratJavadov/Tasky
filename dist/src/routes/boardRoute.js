@@ -29,4 +29,5 @@ const boardController = __importStar(require("../controllers/boardController"));
 const boardRouter = (0, express_1.Router)();
 exports.boardRouter = boardRouter;
 boardRouter.get('/', boardController.getBoards);
+boardRouter.get('/:id', boardController.getDetailedBoard);
 boardRouter.post('/', boardController.createBoard);

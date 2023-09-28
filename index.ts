@@ -5,6 +5,7 @@ import cors from 'cors';
 import { boardRouter } from './src/routes/boardRoute';
 import { taskRouter } from './src/routes/taskRoute';
 import { columnRouter } from './src/routes/columnRoute';
+import { prisma } from './src/db';
 
 dotenv.config();
 
@@ -19,6 +20,11 @@ app.use('/board', boardRouter);
 app.use('/task', taskRouter);
 app.use('/column', columnRouter);
 
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+async function startServer() {
+  await prisma.$connect();
+  app.listen(port, () => {
+    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  });
+}
+
+startServer().catch((e) => console.error(e));
