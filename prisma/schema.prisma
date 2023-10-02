@@ -17,6 +17,12 @@ model Board {
   createdAt DateTime @default(now())
 }
 
+enum Columns {
+  QUEUE
+  DEVELOPMENT
+  DONE
+}
+
 model Column {
   id        Int      @id @default(autoincrement())
   name      String

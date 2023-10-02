@@ -28,7 +28,11 @@ export const getDetailedBoard = async (
       include: {
         columns: {
           include: {
-            task: true,
+            task: {
+              include: {
+                comments: true,
+              },
+            },
           },
         },
       },
@@ -40,8 +44,6 @@ export const getDetailedBoard = async (
     return res.status(500).json({ message: 'Something went wrong' });
   }
 };
-
-getDetailedBoard;
 
 export const createBoard = async (req: Request, res: Response) => {
   const { name } = req.body ?? {};

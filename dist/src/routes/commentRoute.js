@@ -23,11 +23,10 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.taskRouter = void 0;
+exports.commentRoute = void 0;
 const express_1 = require("express");
-const taskController = __importStar(require("../controllers/taskController"));
-const taskRouter = (0, express_1.Router)();
-exports.taskRouter = taskRouter;
-taskRouter.get('/', taskController.getTasks);
-taskRouter.post('/', taskController.createTask);
-taskRouter.patch('/:id', taskController.updateTask);
+const commentController = __importStar(require("../controllers/commentController"));
+const commentRoute = (0, express_1.Router)();
+exports.commentRoute = commentRoute;
+// commentRoute.get('/', commentController.getTasks);
+commentRoute.post('/', commentController.createComment);

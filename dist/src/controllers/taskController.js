@@ -9,8 +9,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createTask = exports.getTasks = void 0;
+exports.updateTask = exports.createTask = exports.getTasks = void 0;
 const db_1 = require("../db");
+var Columns;
+(function (Columns) {
+    Columns["QUEUE"] = "Queue";
+    Columns["DEVELOPMENT"] = "Development";
+    Columns["DONE"] = "Done";
+})(Columns || (Columns = {}));
+const allowToUpate = ['name', 'description', 'priority'];
 const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allTasks = yield db_1.prisma.task.findMany();
     res.status(200).json({ data: allTasks });
@@ -22,14 +29,21 @@ const createTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     if (!name || !columnId)
         return res.status(404).json({ message: 'Missing some fields' });
     try {
+        const column = yield db_1.prisma.column.findUnique({
+            where: {
+                id: columnId,
+                name: Columns.QUEUE,
+            },
+        });
+        console.log({ column });
+        if (!column)
+            return res
+                .status(404)
+                .json({ message: 'You can create task only in QUEUE' });
         const newTask = yield db_1.prisma.task.create({
             data: {
-                name,
-                column: {
-                    connect: {
-                        id: columnId,
-                    },
-                },
+                name: name,
+                columnId: columnId,
             },
         });
         res.status(201).json({ data: newTask });
@@ -39,3 +53,32 @@ const createTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createTask = createTask;
+const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const body = req.body;
+    const param = req.params;
+    const newBody = allowToUpate.reduce((obj, current) => {
+        if (body[current]) {
+            return Object.assign(Object.assign({}, obj), { [current]: body[current] });
+        }
+        else {
+            return obj;
+        }
+    }, {});
+    if (!param || !newBody)
+        return res.status(400).json({ message: 'Wrong input' });
+    if (isNaN(Number(param.id)))
+        return res.status(400);
+    try {
+        const updatedTask = yield db_1.prisma.task.update({
+            where: {
+                id: +param.id,
+            },
+            data: newBody,
+        });
+        res.status(201).json({ data: updatedTask });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.updateTask = updateTask;

@@ -30,7 +30,11 @@ const getDetailedBoard = (req, res) => __awaiter(void 0, void 0, void 0, functio
             include: {
                 columns: {
                     include: {
-                        task: true,
+                        task: {
+                            include: {
+                                comments: true,
+                            },
+                        },
                     },
                 },
             },
@@ -44,7 +48,6 @@ const getDetailedBoard = (req, res) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.getDetailedBoard = getDetailedBoard;
-exports.getDetailedBoard;
 const createBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const { name } = (_a = req.body) !== null && _a !== void 0 ? _a : {};
