@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTask = exports.createTask = exports.getTasks = void 0;
+exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
 const db_1 = require("../db");
 var Columns;
 (function (Columns) {
@@ -53,6 +53,39 @@ const createTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.createTask = createTask;
+const createSubTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const { name } = (_b = req.body) !== null && _b !== void 0 ? _b : {};
+    const { parentId } = req.params;
+    console.log(parentId);
+    if (!name || !parentId || isNaN(+parentId))
+        return res.status(404).json({ message: 'Missing some fields' });
+    try {
+        const taskParent = yield db_1.prisma.task.findUnique({
+            where: {
+                id: +parentId,
+                parentId: null,
+            },
+        });
+        if (!taskParent)
+            return res.status(400).json({ message: 'Error creating subtask' });
+        const subTask = yield db_1.prisma.task.create({
+            data: {
+                name,
+                parentId: +parentId,
+            },
+        });
+        res.status(201).json({
+            data: {
+                subTask: subTask,
+            },
+        });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.createSubTask = createSubTask;
 const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const body = req.body;
     const param = req.params;

@@ -37,11 +37,15 @@ model Task {
   name        String
   description String?
   priority    Priority  @default(LOW)
-  columnId    Int
-  column      Column    @relation(fields: [columnId], references: [id])
+  columnId    Int?
+  column      Column?   @relation(fields: [columnId], references: [id])
   files       File[]
   comments    Comment[]
   createdAt   DateTime  @default(now())
+
+  subTasks Task[] @relation("TaskSubtask")
+  parent   Task?  @relation("TaskSubtask", fields: [parentId], references: [id])
+  parentId Int?
 }
 
 enum Priority {

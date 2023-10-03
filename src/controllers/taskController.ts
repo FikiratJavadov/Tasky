@@ -51,6 +51,43 @@ export const createTask = async (req: Request, res: Response) => {
   }
 };
 
+export const createSubTask = async (req: Request, res: Response) => {
+  const { name } = (req.body as PostCreateBody) ?? {};
+
+  const { parentId } = req.params;
+  console.log(parentId);
+
+  if (!name || !parentId || isNaN(+parentId))
+    return res.status(404).json({ message: 'Missing some fields' });
+
+  try {
+    const taskParent = await prisma.task.findUnique({
+      where: {
+        id: +parentId,
+        parentId: null,
+      },
+    });
+
+    if (!taskParent)
+      return res.status(400).json({ message: 'Error creating subtask' });
+
+    const subTask = await prisma.task.create({
+      data: {
+        name,
+        parentId: +parentId,
+      },
+    });
+
+    res.status(201).json({
+      data: {
+        subTask: subTask,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
 export const updateTask = async (req: Request, res: Response) => {
   const body = req.body;
   const param = req.params as { id: string };

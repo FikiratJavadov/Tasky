@@ -32,7 +32,7 @@ const getDetailedBoard = (req, res) => __awaiter(void 0, void 0, void 0, functio
                     include: {
                         task: {
                             include: {
-                                comments: true,
+                                subTasks: true,
                             },
                         },
                     },

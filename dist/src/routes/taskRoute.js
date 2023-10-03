@@ -30,4 +30,5 @@ const taskRouter = (0, express_1.Router)();
 exports.taskRouter = taskRouter;
 taskRouter.get('/', taskController.getTasks);
 taskRouter.post('/', taskController.createTask);
+taskRouter.post('/:parentId', taskController.createSubTask);
 taskRouter.patch('/:id', taskController.updateTask);
