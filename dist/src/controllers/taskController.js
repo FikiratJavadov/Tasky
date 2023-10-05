@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
+exports.moveColumn = exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
 const db_1 = require("../db");
 var Columns;
 (function (Columns) {
@@ -17,7 +17,7 @@ var Columns;
     Columns["DEVELOPMENT"] = "Development";
     Columns["DONE"] = "Done";
 })(Columns || (Columns = {}));
-const allowToUpate = ['name', 'description', 'priority', "columnId"];
+const allowToUpate = ['name', 'description', 'priority', 'columnId'];
 const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allTasks = yield db_1.prisma.task.findMany();
     res.status(200).json({ data: allTasks });
@@ -75,8 +75,8 @@ const createSubTask = (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 parentId: +parentId,
             },
             include: {
-                subTasks: true
-            }
+                subTasks: true,
+            },
         });
         res.status(201).json({
             data: {
@@ -118,3 +118,59 @@ const updateTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.updateTask = updateTask;
+function reorder(tasks, columndId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const updates = tasks.map((task) => db_1.prisma.task.update({
+            where: { id: task.id },
+            data: {
+                position: task.position,
+                columnId: columndId,
+            },
+        }));
+        yield Promise.all(updates);
+    });
+}
+function reorderOldColumn(oldColumnId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const column = yield db_1.prisma.column.findUnique({
+            where: { id: oldColumnId },
+            include: {
+                task: {
+                    orderBy: {
+                        position: 'asc',
+                    },
+                },
+            },
+        });
+        if (!column)
+            return;
+        for (let i = 0; i < column.task.length; i++) {
+            const taskId = column.task[i].id;
+            yield db_1.prisma.task.update({
+                where: { id: taskId },
+                data: { position: i + 1 },
+            });
+        }
+    });
+}
+const moveColumn = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    const { oldColumnId, newColumnId, tasks } = (_c = req.body) !== null && _c !== void 0 ? _c : {};
+    if (!newColumnId || !oldColumnId) {
+        return res.status(400).json({ message: 'Please provide all columns ids' });
+    }
+    if (newColumnId === oldColumnId) {
+        yield reorder(tasks, newColumnId);
+    }
+    else {
+        yield reorder(tasks, newColumnId);
+        yield reorderOldColumn(oldColumnId);
+    }
+    res.status(200).json({ message: 'Update position of all tasks' });
+    try {
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.moveColumn = moveColumn;

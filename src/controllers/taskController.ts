@@ -8,7 +8,7 @@ enum Columns {
   DONE = 'Done',
 }
 
-const allowToUpate = ['name', 'description', 'priority', "columnId"];
+const allowToUpate = ['name', 'description', 'priority', 'columnId'];
 
 type PostCreateBody = Prisma.Args<typeof prisma.task, 'create'>['data'];
 
@@ -77,8 +77,8 @@ export const createSubTask = async (req: Request, res: Response) => {
         parentId: +parentId,
       },
       include: {
-        subTasks: true
-      }
+        subTasks: true,
+      },
     });
 
     res.status(201).json({
@@ -117,6 +117,77 @@ export const updateTask = async (req: Request, res: Response) => {
     });
 
     res.status(201).json({ data: updatedTask });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+type ReorderedItems = {
+  id: number;
+  position: number;
+};
+
+type MoveColumn = {
+  oldColumnId: number;
+  newColumnId: number;
+  tasks: ReorderedItems[];
+};
+
+async function reorder(tasks: ReorderedItems[], columndId: number) {
+  const updates = tasks.map((task) =>
+    prisma.task.update({
+      where: { id: task.id },
+      data: {
+        position: task.position,
+        columnId: columndId,
+      },
+    })
+  );
+
+  await Promise.all(updates);
+}
+
+async function reorderOldColumn(oldColumnId: number) {
+  const column = await prisma.column.findUnique({
+    where: { id: oldColumnId },
+    include: {
+      task: {
+        orderBy: {
+          position: 'asc',
+        },
+      },
+    },
+  });
+
+  if (!column) return;
+
+  for (let i = 0; i < column.task.length; i++) {
+    const taskId = column.task[i].id;
+
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { position: i + 1 },
+    });
+  }
+}
+
+export const moveColumn = async (req: Request, res: Response) => {
+  const { oldColumnId, newColumnId, tasks } = (req.body as MoveColumn) ?? {};
+
+  if (!newColumnId || !oldColumnId) {
+    return res.status(400).json({ message: 'Please provide all columns ids' });
+  }
+
+  if (newColumnId === oldColumnId) {
+    await reorder(tasks, newColumnId);
+  } else {
+    await reorder(tasks, newColumnId);
+    await reorderOldColumn(oldColumnId);
+  }
+
+  res.status(200).json({ message: 'Update position of all tasks' });
+
+  try {
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong' });
   }

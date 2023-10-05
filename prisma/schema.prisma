@@ -43,6 +43,8 @@ model Task {
   comments    Comment[]
   createdAt   DateTime  @default(now())
 
+  position Int @default(autoincrement()) // Position in column
+
   subTasks Task[] @relation("TaskSubtask")
   parent   Task?  @relation("TaskSubtask", fields: [parentId], references: [id])
   parentId Int?

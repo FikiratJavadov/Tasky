@@ -35,6 +35,9 @@ const getDetailedBoard = (req, res) => __awaiter(void 0, void 0, void 0, functio
                                 subTasks: true,
                                 comments: true,
                             },
+                            orderBy: {
+                                position: 'asc',
+                            },
                         },
                     },
                 },
@@ -65,3 +68,18 @@ const createBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     res.status(201).json({ data: newBoard });
 });
 exports.createBoard = createBoard;
+//["a", "b"]
+//splice(oldIndex, 1)
+//splice(newIndex, 0, "c")
+//[c, a, b]
+//Queue
+// const Queue = [
+//   {id: "c", pos: 1},
+//   {id: "b", pos: 3},
+// ]
+// const Done = [
+//   {id: "f", pos: 1},
+//   {id: "a", pos: 2},
+// ]
+// const newItems = items.map((item, index) => ({...item, pos: index + 1}))
+//  oldIndex, newIndex

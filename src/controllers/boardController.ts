@@ -33,6 +33,9 @@ export const getDetailedBoard = async (
                 subTasks: true,
                 comments: true,
               },
+              orderBy: {
+                position: 'asc',
+              },
             },
           },
         },
@@ -61,3 +64,25 @@ export const createBoard = async (req: Request, res: Response) => {
 
   res.status(201).json({ data: newBoard });
 };
+
+//["a", "b"]
+//splice(oldIndex, 1)
+//splice(newIndex, 0, "c")
+
+//[c, a, b]
+
+//Queue
+
+// const Queue = [
+//   {id: "c", pos: 1},
+//   {id: "b", pos: 3},
+// ]
+
+// const Done = [
+//   {id: "f", pos: 1},
+//   {id: "a", pos: 2},
+// ]
+
+// const newItems = items.map((item, index) => ({...item, pos: index + 1}))
+
+//  oldIndex, newIndex
