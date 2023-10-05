@@ -8,7 +8,7 @@ enum Columns {
   DONE = 'Done',
 }
 
-const allowToUpate = ['name', 'description', 'priority'];
+const allowToUpate = ['name', 'description', 'priority', "columnId"];
 
 type PostCreateBody = Prisma.Args<typeof prisma.task, 'create'>['data'];
 
@@ -76,6 +76,9 @@ export const createSubTask = async (req: Request, res: Response) => {
         name,
         parentId: +parentId,
       },
+      include: {
+        subTasks: true
+      }
     });
 
     res.status(201).json({

@@ -31,6 +31,7 @@ export const getDetailedBoard = async (
             task: {
               include: {
                 subTasks: true,
+                comments: true,
               },
             },
           },
