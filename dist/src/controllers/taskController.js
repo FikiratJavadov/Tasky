@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.moveColumn = exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
+exports.removeTask = exports.moveColumn = exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
 const db_1 = require("../db");
 var Columns;
 (function (Columns) {
@@ -174,3 +174,21 @@ const moveColumn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.moveColumn = moveColumn;
+const removeTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id } = req.params;
+    if (isNaN(+id))
+        return res.status(404).json({ message: 'Missing some fields' });
+    try {
+        const task = yield db_1.prisma.task.deleteMany({
+            where: {
+                id: parseInt(id),
+            },
+        });
+        res.status(204).json({ data: task });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.removeTask = removeTask;

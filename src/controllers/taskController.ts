@@ -192,3 +192,23 @@ export const moveColumn = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
+export const removeTask = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (isNaN(+id))
+    return res.status(404).json({ message: 'Missing some fields' });
+
+  try {
+    const task = await prisma.task.deleteMany({
+      where: {
+        id: parseInt(id),
+      },
+    });
+
+    res.status(204).json({ data: task });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};

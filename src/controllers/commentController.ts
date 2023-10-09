@@ -109,3 +109,13 @@ export const createComment = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
+
+
+
+
+
+
+// prisma.$transaction([prisma, prisma])
+
+Promise.all([])

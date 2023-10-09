@@ -33,3 +33,4 @@ taskRouter.post('/', taskController.createTask);
 taskRouter.post('/:parentId', taskController.createSubTask);
 taskRouter.patch('/:id', taskController.updateTask);
 taskRouter.post('/:id/move', taskController.moveColumn);
+taskRouter.delete('/:id', taskController.removeTask);
