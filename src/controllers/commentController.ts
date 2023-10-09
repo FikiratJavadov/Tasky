@@ -1,21 +1,110 @@
 import { Request, Response } from 'express';
 import { prisma } from '../db';
+import { Prisma } from '@prisma/client';
 
-export const createComment = async (req: Request, res: Response) => {
-  const { content, taskId } = (req.body as any) ?? {};
+type FinalComments = (Prisma.CommentGetPayload<{}> & {comments: Prisma.CommentGetPayload<{}>[]})[]
 
-  if (!content || !taskId)
-    return res.status(400).json({ message: 'Invalid inputs' });
+//
+
+/*
+  {
+        "id": 2,
+        "content": "My first comment",
+        "taskId": 1,
+        "parentId": null,
+        "createdAt": "2023-10-09T19:24:12.291Z"
+        comments: ?
+  }
+
+  res = []
+
+*/
+
+
+function walk(comments: Prisma.CommentGetPayload<{}>[], parentId: null | number = null ){
+
+  const res: FinalComments = [];
+  
+  const allMainComments = comments.filter(c => c.parentId === parentId)
+
+  if(allMainComments.length === 0) return res;
+
+  for(let comment of allMainComments){
+    res.push({...comment, comments: walk(comments, comment.id)})
+  }
+
+  return res;
+
+}
+
+
+
+export const getCommentByTaskId = async (req: Request, res: Response) => {
+  const { taskId } = req.params ?? {};
+
+  if (!taskId) return res.status(400).json({ message: 'Invalid inputs' });
 
   try {
-    const newComment = await prisma.comment.create({
-      data: {
-        content: content,
-        taskId: taskId,
+    const allComments = await prisma.comment.findMany({
+      where: {
+        taskId: parseInt(taskId),
       },
     });
 
-    res.status(401).json({ data: newComment });
+
+    
+    
+    const updatedComments = walk(allComments)
+    res.send(updatedComments)
+
+
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};
+
+type CommentProps = {
+  taskId: number;
+  content: string;
+  parentId: number | null;
+};
+
+async function createCommentApi(body: CommentProps) {
+  const newComment = await prisma.comment.create({
+    data: {
+      content: body.content,
+      taskId: body.taskId,
+    },
+  });
+
+  return newComment;
+}
+async function createSubcommentApi(body: CommentProps) {
+  const newComment = await prisma.comment.create({
+    data: {
+      content: body.content,
+      taskId: body.taskId,
+      parentId: body.parentId,
+    },
+  });
+
+  return newComment;
+}
+
+export const createComment = async (req: Request, res: Response) => {
+  const body = (req.body as CommentProps) ?? {};
+
+  if (!body.content || !body.taskId)
+    return res.status(400).json({ message: 'Invalid inputs' });
+
+  try {
+    if (body.parentId) {
+      const newComment = await createSubcommentApi(body);
+      res.status(401).json({ data: newComment });
+    } else {
+      const newComment = await createCommentApi(body);
+      res.status(401).json({ data: newComment });
+    }
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong' });
   }

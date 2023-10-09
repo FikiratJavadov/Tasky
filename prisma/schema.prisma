@@ -65,9 +65,14 @@ model File {
 }
 
 model Comment {
-  id        Int      @id @default(autoincrement())
-  content   String
-  taskId    Int
-  task      Task     @relation(fields: [taskId], references: [id])
+  id      Int    @id @default(autoincrement())
+  content String
+  taskId  Int
+  task    Task   @relation(fields: [taskId], references: [id])
+
+  comments  Comment[] @relation("CommentComment")
+  comment   Comment?  @relation("CommentComment", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parentId Int?
+
   createdAt DateTime @default(now())
 }

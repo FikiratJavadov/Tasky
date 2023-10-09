@@ -9,21 +9,88 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createComment = void 0;
+exports.createComment = exports.getCommentByTaskId = void 0;
 const db_1 = require("../db");
-const createComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+//
+/*
+  {
+        "id": 2,
+        "content": "My first comment",
+        "taskId": 1,
+        "parentId": null,
+        "createdAt": "2023-10-09T19:24:12.291Z"
+        comments: ?
+  }
+
+  res = []
+
+*/
+function walk(comments, parentId = null) {
+    const res = [];
+    const allMainComments = comments.filter(c => c.parentId === parentId);
+    if (allMainComments.length === 0)
+        return res;
+    for (let comment of allMainComments) {
+        res.push(Object.assign(Object.assign({}, comment), { comments: walk(comments, comment.id) }));
+    }
+    return res;
+}
+const getCommentByTaskId = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    const { content, taskId } = (_a = req.body) !== null && _a !== void 0 ? _a : {};
-    if (!content || !taskId)
+    const { taskId } = (_a = req.params) !== null && _a !== void 0 ? _a : {};
+    if (!taskId)
         return res.status(400).json({ message: 'Invalid inputs' });
     try {
-        const newComment = yield db_1.prisma.comment.create({
-            data: {
-                content: content,
-                taskId: taskId,
+        const allComments = yield db_1.prisma.comment.findMany({
+            where: {
+                taskId: parseInt(taskId),
             },
         });
-        res.status(401).json({ data: newComment });
+        const updatedComments = walk(allComments);
+        res.send(updatedComments);
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.getCommentByTaskId = getCommentByTaskId;
+function createCommentApi(body) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const newComment = yield db_1.prisma.comment.create({
+            data: {
+                content: body.content,
+                taskId: body.taskId,
+            },
+        });
+        return newComment;
+    });
+}
+function createSubcommentApi(body) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const newComment = yield db_1.prisma.comment.create({
+            data: {
+                content: body.content,
+                taskId: body.taskId,
+                parentId: body.parentId,
+            },
+        });
+        return newComment;
+    });
+}
+const createComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const body = (_b = req.body) !== null && _b !== void 0 ? _b : {};
+    if (!body.content || !body.taskId)
+        return res.status(400).json({ message: 'Invalid inputs' });
+    try {
+        if (body.parentId) {
+            const newComment = yield createSubcommentApi(body);
+            res.status(401).json({ data: newComment });
+        }
+        else {
+            const newComment = yield createCommentApi(body);
+            res.status(401).json({ data: newComment });
+        }
     }
     catch (error) {
         return res.status(500).json({ message: 'Something went wrong' });

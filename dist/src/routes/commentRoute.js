@@ -28,5 +28,5 @@ const express_1 = require("express");
 const commentController = __importStar(require("../controllers/commentController"));
 const commentRoute = (0, express_1.Router)();
 exports.commentRoute = commentRoute;
-// commentRoute.get('/', commentController.getTasks);
+commentRoute.get('/:taskId', commentController.getCommentByTaskId);
 commentRoute.post('/', commentController.createComment);
