@@ -212,3 +212,41 @@ export const removeTask = async (req: Request, res: Response) => {
     return res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
+export const updateStatus = async (req: Request, res: Response) => {
+  const { id } = req.params; // task id
+  const body = (req.body as { columnId: number }) ?? {}; // column id
+
+  if (isNaN(+id))
+    return res.status(404).json({ message: 'Missing some fields' });
+
+  try {
+    const aggregate = await prisma.task.aggregate({
+      where: {
+        column: {
+          id: body.columnId,
+        },
+      },
+      _max: {
+        position: true,
+      },
+    });
+
+    const max = aggregate._max.position;
+
+    const updatedTask = await prisma.task.update({
+      where: {
+        id: parseInt(id),
+      },
+      data: {
+        columnId: body.columnId,
+        position: typeof max !== 'number' ? 1 : max + 1,
+      },
+    });
+
+    res.status(204).json({ data: updatedTask });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};

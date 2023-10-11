@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.removeTask = exports.moveColumn = exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
+exports.updateStatus = exports.removeTask = exports.moveColumn = exports.updateTask = exports.createSubTask = exports.createTask = exports.getTasks = void 0;
 const db_1 = require("../db");
 var Columns;
 (function (Columns) {
@@ -192,3 +192,38 @@ const removeTask = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     }
 });
 exports.removeTask = removeTask;
+const updateStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d;
+    const { id } = req.params; // task id
+    const body = (_d = req.body) !== null && _d !== void 0 ? _d : {}; // column id
+    if (isNaN(+id))
+        return res.status(404).json({ message: 'Missing some fields' });
+    try {
+        const aggregate = yield db_1.prisma.task.aggregate({
+            where: {
+                column: {
+                    id: body.columnId,
+                },
+            },
+            _max: {
+                position: true,
+            },
+        });
+        const max = aggregate._max.position;
+        const updatedTask = yield db_1.prisma.task.update({
+            where: {
+                id: parseInt(id),
+            },
+            data: {
+                columnId: body.columnId,
+                position: typeof max !== 'number' ? 1 : max + 1,
+            },
+        });
+        res.status(204).json({ data: updatedTask });
+    }
+    catch (error) {
+        console.log(error);
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.updateStatus = updateStatus;

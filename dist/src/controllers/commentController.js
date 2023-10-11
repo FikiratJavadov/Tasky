@@ -97,5 +97,3 @@ const createComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createComment = createComment;
-// prisma.$transaction([prisma, prisma])
-Promise.all([]);

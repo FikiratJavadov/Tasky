@@ -32,6 +32,12 @@ model Column {
   task      Task[]
 }
 
+enum Status {
+  QUEUE
+  DEVELOPMENT
+  DONE
+}
+
 model Task {
   id          Int       @id @default(autoincrement())
   name        String
@@ -42,6 +48,8 @@ model Task {
   files       File[]
   comments    Comment[]
   createdAt   DateTime  @default(now())
+
+  status Status @default(QUEUE)
 
   position Int @default(autoincrement()) // Position in column
 
@@ -76,4 +84,3 @@ model Comment {
 
   createdAt DateTime @default(now())
 }
-

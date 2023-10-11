@@ -115,7 +115,3 @@ export const createComment = async (req: Request, res: Response) => {
 
 
 
-
-// prisma.$transaction([prisma, prisma])
-
-Promise.all([])
