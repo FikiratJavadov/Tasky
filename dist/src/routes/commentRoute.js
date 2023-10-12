@@ -30,3 +30,4 @@ const commentRoute = (0, express_1.Router)();
 exports.commentRoute = commentRoute;
 commentRoute.get('/:taskId', commentController.getCommentByTaskId);
 commentRoute.post('/', commentController.createComment);
+commentRoute.delete('/:id', commentController.deleteComment);

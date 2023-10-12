@@ -65,24 +65,20 @@ export const createBoard = async (req: Request, res: Response) => {
   res.status(201).json({ data: newBoard });
 };
 
-//["a", "b"]
-//splice(oldIndex, 1)
-//splice(newIndex, 0, "c")
+export const deleteBoard = async (req: Request, res: Response) => {
+  const id = req.params?.id;
 
-//[c, a, b]
+  if (!id) return res.status(400).json({ message: 'Invalid inputs' });
 
-//Queue
+  try {
+    await prisma.board.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
 
-// const Queue = [
-//   {id: "c", pos: 1},
-//   {id: "b", pos: 3},
-// ]
-
-// const Done = [
-//   {id: "f", pos: 1},
-//   {id: "a", pos: 2},
-// ]
-
-// const newItems = items.map((item, index) => ({...item, pos: index + 1}))
-
-//  oldIndex, newIndex
+    res.status(200).json({message: 'Board deleted'});
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};

@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { prisma } from '../db';
 import { Prisma } from '@prisma/client';
 
-type FinalComments = (Prisma.CommentGetPayload<{}> & {comments: Prisma.CommentGetPayload<{}>[]})[]
+type FinalComments = (Prisma.CommentGetPayload<{}> & {
+  comments: Prisma.CommentGetPayload<{}>[];
+})[];
 
 //
 
@@ -20,24 +22,22 @@ type FinalComments = (Prisma.CommentGetPayload<{}> & {comments: Prisma.CommentGe
 
 */
 
-
-function walk(comments: Prisma.CommentGetPayload<{}>[], parentId: null | number = null ){
-
+function walk(
+  comments: Prisma.CommentGetPayload<{}>[],
+  parentId: null | number = null
+) {
   const res: FinalComments = [];
-  
-  const allMainComments = comments.filter(c => c.parentId === parentId)
 
-  if(allMainComments.length === 0) return res;
+  const allMainComments = comments.filter((c) => c.parentId === parentId);
 
-  for(let comment of allMainComments){
-    res.push({...comment, comments: walk(comments, comment.id)})
+  if (allMainComments.length === 0) return res;
+
+  for (let comment of allMainComments) {
+    res.push({ ...comment, comments: walk(comments, comment.id) });
   }
 
   return res;
-
 }
-
-
 
 export const getCommentByTaskId = async (req: Request, res: Response) => {
   const { taskId } = req.params ?? {};
@@ -51,13 +51,8 @@ export const getCommentByTaskId = async (req: Request, res: Response) => {
       },
     });
 
-
-    
-    
-    const updatedComments = walk(allComments)
-    res.send(updatedComments)
-
-
+    const updatedComments = walk(allComments);
+    res.send(updatedComments);
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong' });
   }
@@ -110,8 +105,20 @@ export const createComment = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteComment = async (req: Request, res: Response) => {
+  const id = req.params?.id;
 
+  if (!id) return res.status(400).json({ message: 'Invalid inputs' });
 
+  try {
+    await prisma.comment.delete({
+      where: {
+        id: parseInt(id),
+      },
+    });
 
-
-
+    res.status(200).json({ message: 'Comment deleted' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Something went wrong' });
+  }
+};

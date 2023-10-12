@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createComment = exports.getCommentByTaskId = void 0;
+exports.deleteComment = exports.createComment = exports.getCommentByTaskId = void 0;
 const db_1 = require("../db");
 //
 /*
@@ -27,7 +27,7 @@ const db_1 = require("../db");
 */
 function walk(comments, parentId = null) {
     const res = [];
-    const allMainComments = comments.filter(c => c.parentId === parentId);
+    const allMainComments = comments.filter((c) => c.parentId === parentId);
     if (allMainComments.length === 0)
         return res;
     for (let comment of allMainComments) {
@@ -97,3 +97,21 @@ const createComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     }
 });
 exports.createComment = createComment;
+const deleteComment = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _c;
+    const id = (_c = req.params) === null || _c === void 0 ? void 0 : _c.id;
+    if (!id)
+        return res.status(400).json({ message: 'Invalid inputs' });
+    try {
+        yield db_1.prisma.comment.delete({
+            where: {
+                id: parseInt(id),
+            },
+        });
+        res.status(200).json({ message: 'Comment deleted' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.deleteComment = deleteComment;

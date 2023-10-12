@@ -31,3 +31,4 @@ exports.boardRouter = boardRouter;
 boardRouter.get('/', boardController.getBoards);
 boardRouter.get('/:id', boardController.getDetailedBoard);
 boardRouter.post('/', boardController.createBoard);
+boardRouter.delete('/:id', boardController.deleteBoard);

@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createBoard = exports.getDetailedBoard = exports.getBoards = void 0;
+exports.deleteBoard = exports.createBoard = exports.getDetailedBoard = exports.getBoards = void 0;
 const db_1 = require("../db");
 const getBoards = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allBoard = yield db_1.prisma.board.findMany();
@@ -68,18 +68,21 @@ const createBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     res.status(201).json({ data: newBoard });
 });
 exports.createBoard = createBoard;
-//["a", "b"]
-//splice(oldIndex, 1)
-//splice(newIndex, 0, "c")
-//[c, a, b]
-//Queue
-// const Queue = [
-//   {id: "c", pos: 1},
-//   {id: "b", pos: 3},
-// ]
-// const Done = [
-//   {id: "f", pos: 1},
-//   {id: "a", pos: 2},
-// ]
-// const newItems = items.map((item, index) => ({...item, pos: index + 1}))
-//  oldIndex, newIndex
+const deleteBoard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _b;
+    const id = (_b = req.params) === null || _b === void 0 ? void 0 : _b.id;
+    if (!id)
+        return res.status(400).json({ message: 'Invalid inputs' });
+    try {
+        yield db_1.prisma.board.delete({
+            where: {
+                id: parseInt(id),
+            },
+        });
+        res.status(200).json({ message: 'Board deleted' });
+    }
+    catch (error) {
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+});
+exports.deleteBoard = deleteBoard;
