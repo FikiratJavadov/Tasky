@@ -6,22 +6,6 @@ type FinalComments = (Prisma.CommentGetPayload<{}> & {
   comments: Prisma.CommentGetPayload<{}>[];
 })[];
 
-//
-
-/*
-  {
-        "id": 2,
-        "content": "My first comment",
-        "taskId": 1,
-        "parentId": null,
-        "createdAt": "2023-10-09T19:24:12.291Z"
-        comments: ?
-  }
-
-  res = []
-
-*/
-
 function walk(
   comments: Prisma.CommentGetPayload<{}>[],
   parentId: null | number = null
