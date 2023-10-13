@@ -185,7 +185,7 @@ export const moveColumn = async (req: Request, res: Response) => {
     await reorderOldColumn(oldColumnId);
   }
 
-  res.status(200).json({ message: 'Update position of all tasks' });
+  res.status(200).json({ message: 'Update position of all tasks!' });
 
   try {
   } catch (error) {

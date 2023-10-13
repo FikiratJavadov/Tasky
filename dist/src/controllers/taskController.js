@@ -17,7 +17,7 @@ var Columns;
     Columns["DEVELOPMENT"] = "Development";
     Columns["DONE"] = "Done";
 })(Columns || (Columns = {}));
-const allowToUpate = ['name', 'description', 'priority', 'columnId'];
+const allowToUpate = ['name', 'description', 'priority'];
 const getTasks = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const allTasks = yield db_1.prisma.task.findMany();
     res.status(200).json({ data: allTasks });

@@ -11,20 +11,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteComment = exports.createComment = exports.getCommentByTaskId = void 0;
 const db_1 = require("../db");
-//
-/*
-  {
-        "id": 2,
-        "content": "My first comment",
-        "taskId": 1,
-        "parentId": null,
-        "createdAt": "2023-10-09T19:24:12.291Z"
-        comments: ?
-  }
-
-  res = []
-
-*/
 function walk(comments, parentId = null) {
     const res = [];
     const allMainComments = comments.filter((c) => c.parentId === parentId);
@@ -85,11 +71,11 @@ const createComment = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     try {
         if (body.parentId) {
             const newComment = yield createSubcommentApi(body);
-            res.status(401).json({ data: newComment });
+            res.status(200).json({ data: newComment });
         }
         else {
             const newComment = yield createCommentApi(body);
-            res.status(401).json({ data: newComment });
+            res.status(200).json({ data: newComment });
         }
     }
     catch (error) {
