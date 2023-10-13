@@ -58,6 +58,14 @@ model Task {
   parentId Int?
 }
 
+
+
+
+//photki => imgPath
+//textEditor =>
+
+
+
 enum Priority {
   LOW
   HIGH

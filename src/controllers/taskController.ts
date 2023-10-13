@@ -8,7 +8,7 @@ enum Columns {
   DONE = 'Done',
 }
 
-const allowToUpate = ['name', 'description', 'priority', 'columnId'];
+const allowToUpate = ['name', 'description', 'priority'];
 
 type PostCreateBody = Prisma.Args<typeof prisma.task, 'create'>['data'];
 

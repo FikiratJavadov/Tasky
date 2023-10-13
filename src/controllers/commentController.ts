@@ -95,10 +95,10 @@ export const createComment = async (req: Request, res: Response) => {
   try {
     if (body.parentId) {
       const newComment = await createSubcommentApi(body);
-      res.status(401).json({ data: newComment });
+      res.status(200).json({ data: newComment });
     } else {
       const newComment = await createCommentApi(body);
-      res.status(401).json({ data: newComment });
+      res.status(200).json({ data: newComment });
     }
   } catch (error) {
     return res.status(500).json({ message: 'Something went wrong' });
