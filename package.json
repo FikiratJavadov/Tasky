@@ -23,7 +23,8 @@
     "express-fileupload": "^1.4.1",
     "init": "^0.1.2",
     "npx": "^10.2.2",
-    "prisma": "^5.3.1"
+    "prisma": "^5.3.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/cors": "^2.8.14",

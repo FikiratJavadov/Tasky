@@ -166,7 +166,7 @@ const moveColumn = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         yield reorder(tasks, newColumnId);
         yield reorderOldColumn(oldColumnId);
     }
-    res.status(200).json({ message: 'Update position of all tasks' });
+    res.status(200).json({ message: 'Update position of all tasks!' });
     try {
     }
     catch (error) {

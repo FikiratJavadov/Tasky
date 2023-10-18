@@ -9,6 +9,7 @@ import { commentRoute } from './src/routes/commentRoute';
 import { prisma } from './src/db';
 import fileUpload from 'express-fileupload';
 import { upload } from './cloudinary';
+import { envObject } from './env';
 
 dotenv.config();
 
@@ -49,6 +50,10 @@ app.post('/upload', async (req, res) => {
     imageUrl: cloudFile.url,
   });
 });
+
+
+
+
 
 async function startServer() {
   await prisma.$connect();
